@@ -1,47 +1,49 @@
 import chess
+from eval_constants import *
 
-board = chess.Board(fen="k1q3r1/ppp5/1n6/5N2/8/8/5PPP/5RQK w - - 0 1")
+board = chess.Board()
+
+game_phase = "mg"
 
 
 def engine_move():
-    print(alphabeta(board, 3, -1000000, 1000000, False))
+    return alphabeta(board, 3, -1000000, 1000000, False)
 
 
-def evaluate_position(position: chess.Board):
-    evaluation = 0
-    piece_values = {
-        "P": 100,
-        "N": 300,
-        "B": 300,
-        "R": 500,
-        "Q": 900,
-        "K": 20000,
-        "p": -100,
-        "n": -300,
-        "b": -300,
-        "r": -500,
-        "q": -900,
-        "k": -20000,
-    }
-    base_board = chess.BaseBoard(position.board_fen())
-    for piece in list(base_board.piece_map().values()):
-        evaluation += piece_values[piece.symbol()]
-    return evaluation
+def evaluate_position(position: chess.Board, is_max_turn: bool):
+    if position.is_checkmate():
+        if is_max_turn:
+            return -20000
+        else:
+            return 20000
+    else:
+        evaluation = 0
+        base_board = chess.BaseBoard(position.board_fen())
+        piece_map = base_board.piece_map()
+        for piece_index in piece_map:
+            piece = piece_map[piece_index]
+            if piece.color == chess.WHITE:
+                evaluation += PIECE_VALUES[game_phase][piece.symbol()]
+                evaluation += WHITE_SQUARE_TABLES[piece.symbol()][game_phase][8 - piece_index >> 3][8 - piece_index & 7]
+            else:
+                evaluation -= PIECE_VALUES[game_phase][piece.symbol().upper()]
+                evaluation -= BLACK_SQUARE_TABLES[piece.symbol().upper()][game_phase][8 - piece_index >> 3][8 - piece_index & 7]
+        return evaluation
 
 
-def alphabeta(position: chess.Board, depth:int, alpha:int, beta:int, is_max_turn:bool):
+def alphabeta(position: chess.Board, depth: int, alpha: int, beta: int, is_max_turn: bool):
     legal_moves = list(position.legal_moves)
     if depth == 0:
-        return (evaluate_position(position), None)
-    
+        return (evaluate_position(position, is_max_turn), None)
+
     bestmove = None
     if is_max_turn:
         value = -1000000
         for node in legal_moves:
-            board = position.copy()
-            board.push(node)
-            eval = alphabeta(board, depth - 1, -1000000, 1000000, False)
+            position.push(node)
+            eval = alphabeta(position, depth - 1, -1000000, 1000000, False)
             value = max(value, eval[0])
+            position.pop()
             if value > alpha:
                 bestmove = node
                 alpha = value
@@ -82,7 +84,7 @@ while True:
     #         fen = command[13:command.find("moves") - 1]
     #         board.set_fen(fen)
     #         for move in moves:
-    #             board.push_uci(move)    
+    #             board.push_uci(move)
     #         print(board)
     # if "go" in command:
     #     legal_moves = [move.uci() for move in list(board.legal_moves)]
@@ -92,7 +94,10 @@ while True:
         if board.outcome():
             print(f"{board.outcome().termination.name}! {board.outcome().result()}")
             break
-        engine_move()
+        move = engine_move()[1]
+        board.push(move)
+        print(move)
+        print(board)
     except chess.IllegalMoveError:
         print("Illegal move")
     except chess.InvalidMoveError:
