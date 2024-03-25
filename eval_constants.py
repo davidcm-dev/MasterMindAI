@@ -155,50 +155,50 @@ WHITE_SQUARE_TABLES = {
 BLACK_SQUARE_TABLES = {
     "P": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["P"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["P"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["P"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["P"]["eg"]
         ]
     },
     "N": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["N"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["N"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["N"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["N"]["eg"]
         ]
     },
     "B": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["B"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["B"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["B"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["B"]["eg"]
         ]
     },
     "R": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["R"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["R"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["R"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["R"]["eg"]
         ]
     },
     "Q": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["Q"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["Q"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["Q"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["Q"]["eg"]
         ]
     },
     "K": {
         "mg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["K"]["mg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["K"]["mg"]
         ],
         "eg": [
-            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["K"]["eg"][::-1]
+            subarray[::-1] for subarray in WHITE_SQUARE_TABLES["K"]["eg"]
         ]
     }
 }
