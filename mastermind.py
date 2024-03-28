@@ -3,8 +3,8 @@ from eval_functions import *
 
 board = chess.Board()
 
-def engine_move(move_was_capture: bool):
-    return alphabeta(board, move_was_capture, 2, -1000000, 1000000, False)
+def engine_move():
+    return negamax(board, 3, -1000000, 1000000, False)
 
 
 while True:
@@ -33,13 +33,11 @@ while True:
     #     legal_moves = [move.uci() for move in list(board.legal_moves)]
     #     print(random.choice(legal_moves))
     try:
-        human_move = chess.Move.from_uci(command)
-        is_capture = board.is_capture(human_move)
         board.push_uci(command)
         if board.outcome():
             print(f"{board.outcome().termination.name}! {board.outcome().result()}")
             break
-        engine_response = engine_move(is_capture)[1]
+        engine_response = engine_move()[1]
         board.push(engine_response)
         print(engine_response)
         print(board)
