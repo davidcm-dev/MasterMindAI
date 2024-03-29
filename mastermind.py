@@ -1,10 +1,13 @@
 import chess
 from eval_functions import *
+from transposition import *
 
 board = chess.Board()
+init_transposition_table()
 
-def engine_move():
-    return negamax(board, 3, -1000000, 1000000, False)
+def engine_move():  
+    reset_transposition_table() 
+    return negamax(board, 4, -1000000, 1000000, False)
 
 
 while True:

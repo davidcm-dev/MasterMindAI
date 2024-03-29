@@ -1,5 +1,6 @@
 import chess
 from eval_constants import *
+from transposition import *
 
 game_phase = "mg"
 
@@ -78,15 +79,33 @@ def evaluate_position(position: chess.Board, is_max_turn: bool):
 #     return (value, bestmove)
     
 def negamax(position: chess.Board, depth: int, alpha: int, beta: int, is_max_turn: bool):
+    alpha_original = alpha
+    
+    tt_entry = search_transposition_table(position)
+    if tt_entry and tt_entry["depth"] >= depth:
+        print("TT hit")
+        if tt_entry["flag"] == "exact":
+            return tt_entry["value"]
+        elif tt_entry["flag"] == "lowerbound":
+            alpha = max(alpha, tt_entry["value"])
+        elif tt_entry["flag"] == "upperbound":
+            beta = min(beta, tt_entry["value"])
+        if alpha >= beta:
+            return tt_entry["value"]
+
     if depth == 0:
         return (evaluate_position(position, is_max_turn), None)
 
     legal_moves = list(position.legal_moves)
     bestmove = None
-    value = -1000000    
+    value = -1000000
     for node in legal_moves:
         position.push(node)
-        evaluation = -negamax(position, depth - 1, -beta, -alpha, not is_max_turn)[0]
+        evaluation = negamax(position, depth - 1, -beta, -alpha, not is_max_turn)
+        if type(evaluation) == tuple:
+            evaluation = -evaluation[0]
+        else:
+            evaluation = -evaluation
         if evaluation > value:
             value = evaluation
             bestmove = node
@@ -94,4 +113,16 @@ def negamax(position: chess.Board, depth: int, alpha: int, beta: int, is_max_tur
         position.pop()
         if alpha >= beta:
             break
+    
+    tt_entry = {}
+    tt_entry["value"] = value
+    if value <= alpha_original:
+        tt_entry["flag"] = "upperbound"
+    elif value >= beta:
+        tt_entry["flag"] = "lowerbound"
+    else:
+        tt_entry["flag"] = "exact"
+    tt_entry["depth"] = depth
+    store_transposition_table(position, tt_entry)
+
     return (value, bestmove)
