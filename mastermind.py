@@ -1,13 +1,24 @@
 import chess
+import time
 from eval_functions import *
 from transposition import *
 
 board = chess.Board()
+time_limit = 10
 init_transposition_table()
 
-def engine_move():  
-    reset_transposition_table() 
-    return negamax(board, 4, -1000000, 1000000, False)
+
+def run_engine():
+    reset_transposition_table()
+    best_value = None
+    best_move = None
+    start_time = time.time()
+    for depth in range(1, 100):
+        engine = negamax(board, depth, -1000000, 1000000, False, start_time, time_limit)
+        if engine:
+            (best_value, best_move) = engine
+        else:
+            return (best_value, best_move, depth - 1)
 
 
 while True:
@@ -36,14 +47,19 @@ while True:
     #     legal_moves = [move.uci() for move in list(board.legal_moves)]
     #     print(random.choice(legal_moves))
     try:
+        moves = 0
         board.push_uci(command)
         if board.outcome():
             print(f"{board.outcome().termination.name}! {board.outcome().result()}")
             break
-        engine_response = engine_move()[1]
-        board.push(engine_response)
-        print(engine_response)
+        if moves == 1:
+            print("A")
+        engine = run_engine()
+        (engine_eval, engine_move, depth) = engine
+        board.push(engine_move)
+        print(f"({-engine_eval/100}) {engine_move}. Depth: {depth}")
         print(board)
+        moves += 1
     except chess.IllegalMoveError:
         print("Illegal move")
     except chess.InvalidMoveError:
