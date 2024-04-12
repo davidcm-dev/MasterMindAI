@@ -4,7 +4,7 @@ from eval_functions import *
 from transposition import *
 
 board = chess.Board()
-time_limit = 10
+time_limit = None
 init_transposition_table()
 
 
@@ -13,9 +13,10 @@ def run_engine():
     best_value = None
     best_move = None
     start_time = time.time()
-    for depth in range(1, 100):
+    for depth in range(1, 7):
         engine = negamax(board, depth, -1000000, 1000000, False, start_time, time_limit)
         if engine:
+            print(engine)
             (best_value, best_move) = engine
         else:
             return (best_value, best_move, depth - 1)
