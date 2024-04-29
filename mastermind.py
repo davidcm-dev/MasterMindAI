@@ -4,19 +4,28 @@ from search_functions import *
 from transposition import *
 
 board = chess.Board()
-time_limit = None
 init_transposition_table()
 
 
-def run_engine():
+def calc_time_limit(go_command: str):
+    if "wtime" in go_command:
+        cmd = go_command[go_command.find("wtime"):].strip().split(" ") # ["wtime", int, "btime", int, "winc", int, "binc", int]
+        if board.turn == chess.WHITE:
+            return int(cmd[1])/1000/(50-board.fullmove_number)
+        else:
+            return int(cmd[3])/1000/(50-board.fullmove_number)
+    else:
+        return 5
+
+
+def run_engine(time_limit: int):
     reset_transposition_table()
     best_value = None
     best_move = None
     start_time = time.time()
-    for depth in range(1, 4):
-        engine = negamax(board, depth, -1000000, 1000000, False, start_time, time_limit)
+    for depth in range(1, 100):
+        engine = negamax(board, depth, -1000000, 1000000, board.turn, start_time, time_limit)
         if engine:
-            print(engine)
             (best_value, best_move) = engine
         else:
             return (best_value, best_move, depth - 1)
@@ -25,21 +34,35 @@ def run_engine():
 
 while True:
     command = input().strip()
-    try:
-        moves = 0
-        board.push_uci(command)
-        if board.outcome():
-            print(f"{board.outcome().termination.name}! {board.outcome().result()}")
-            break
-        if moves == 1:
-            print("A")
-        engine = run_engine()
+    if command == "uci":
+        print("id name MasterMind AI")
+        print("id author davidcm-dev")
+        print("uciok")
+
+    if command == "isready":
+        print("readyok")
+
+    if command == "ucinewgame":
+        board.reset()
+
+    if "position" in command:
+        if "startpos" in command:
+            board.reset()
+        else:
+            fen = command[command.find("fen") + 10:command.find("moves")].strip()
+            board.set_fen(fen)
+        try:
+            moves = command[command.index("moves") + 6:]
+            for move in moves.split(" "):
+                board.push_uci(move.strip())
+        except ValueError:
+            pass
+
+    if "go" in command:
+        engine = run_engine(calc_time_limit(command))
         (engine_eval, engine_move, depth) = engine
         board.push(engine_move)
-        print(f"({-engine_eval/100}) {engine_move}. Depth: {depth}")
-        print(board)
-        moves += 1
-    except chess.IllegalMoveError:
-        print("Illegal move")
-    except chess.InvalidMoveError:
-        print("Invalid UCI move")
+        print("bestmove " + engine_move.uci()) 
+
+    if command == "quit":
+        break
